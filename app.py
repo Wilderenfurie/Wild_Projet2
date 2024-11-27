@@ -9,8 +9,7 @@ import time
 
 #chargement de la database imdb
 def get_imdb_data():
-    link="https://drive.google.com/file/d/12-m1RbdfoQz1SgdQOI8rmuZFh16HjdCg/view?usp=sharing"
-    link='https://drive.google.com/uc?export=download&id=' + link.split('/')[-2] +'&confirm=t'
+    link="https://github.com/Wilderenfurie/Wild_Projet2/blob/15a5257b5aa15a91cb107caf8a217431b9d45de0/movie_imdb.csv?raw=true"
     df_movie=pd.read_csv(link)
     #df_movie=df_movie.astype('str').replace(r'\.0$', '', regex=True)
     return df_movie
@@ -32,14 +31,16 @@ def appel_api(request):
 
 
 #récupération des id tmdb en fonction de nos id imdb
-#def find_movie_by_id():
-#    list_df=[]
-#   for id in id_list_imdb:
-#         result=appel_api("find/"+id+""+key+"&external_source=imdb_id"+lang)
-#         df_movie_tmdb = pd.json_normalize(result)
-#        df_movie_tmdb['tconst'] = id
-#         list_df.append(df_movie_tmdb)
-#    return pd.concat(list_df)
+def find_movie_by_id():
+    list_df=[]
+    for id in id_list_imdb:
+        result=appel_api("find/"+id+""+key+"&external_source=imdb_id"+lang)
+        df_movie_tmdb = pd.json_normalize(result)
+        df_movie_tmdb['tconst'] = id
+        list_df.append(df_movie_tmdb)
+
+    return pd.concat(list_df)
+
 #df_id_tmdb=find_movie_by_id()
 
 
