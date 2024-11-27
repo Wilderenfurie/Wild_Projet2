@@ -11,7 +11,7 @@ import time
 def get_imdb_data():
     link="https://github.com/Wilderenfurie/Wild_Projet2/blob/15a5257b5aa15a91cb107caf8a217431b9d45de0/movie_imdb.csv?raw=true"
     df_movie=pd.read_csv(link)
-    #df_movie=df_movie.astype('str').replace(r'\.0$', '', regex=True)
+    df_movie=df_movie.astype('str').replace(r'\.0$', '', regex=True)
     return df_movie
 
 with st.spinner('Chargement de la base de données'):
