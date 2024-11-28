@@ -13,9 +13,8 @@ def get_imdb_data():
     return df_movie
 
 with st.spinner('Chargement de la base de données'):
-    df_movie = get_imdb_data()
-    id_list_imdb = df_movie.tconst.to_list()
-    
+    df_movie=get_imdb_data()
+
 
 # Chargement de l'API TMDB
 url = "https://api.themoviedb.org/3/"
