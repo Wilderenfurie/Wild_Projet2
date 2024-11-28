@@ -5,8 +5,6 @@ import requests
 import json
 import time
 
-
-
 #chargement de la database imdb
 def get_imdb_data():
     link="https://github.com/Wilderenfurie/Wild_Projet2/blob/61f589997a872074ac131880467b446da300473b/df_full.csv?raw=true"
@@ -33,7 +31,3 @@ def appel_api(request):
 #construction de la page
 st.title("Bienvenue sur les recommandations de votre cinéma")
 st.header("powered by Dat'One")
-st.write(df_movie)
-
-
-
