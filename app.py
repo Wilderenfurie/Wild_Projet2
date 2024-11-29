@@ -8,7 +8,7 @@ import urllib.parse
 
 #chargement de la database imdb
 def get_imdb_data():
-    link="https://github.com/Wilderenfurie/Wild_Projet2/blob/61f589997a872074ac131880467b446da300473b/df_full.csv?raw=true"
+    link="https://github.com/Wilderenfurie/Wild_Projet2/blob/a5e74bc508c2ecf414a63c9f2a0b94f3333e5154/df_full.csv?raw=true"
     df_movie=pd.read_csv(link)
     df_movie=df_movie.astype('str').replace(r'\.0$', '', regex=True)
     return df_movie
@@ -37,8 +37,7 @@ def search_movie(title):
 
 # Construction de la page Streamlit
 st.title("Bienvenue sur les recommandations de votre cinéma")
-st.header("Powered by Dat'Way")
-df_movie
+st.header("Powered by Dat'One")
 
 # Champs de recherche utilisateur
 titre_film = st.text_input("Recherchez un film par titre:")
