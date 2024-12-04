@@ -10,7 +10,7 @@ import urllib.parse
 
 #chargement de la database imdb
 def get_imdb_data():
-    link="https://github.com/Wilderenfurie/Wild_Projet2/blob/c7bb8b56c944b9258a153d7195ceab13921365b2/df_full.csv?raw=true"
+    link="https://github.com/Wilderenfurie/Wild_Projet2/blob/6e3e46ee8a87b156ed88f0d9988f1b0b3c910283/df_full.csv?raw=true"
     df_movie=pd.read_csv(link)
     df_movie=df_movie.astype('str').replace(r'\.0$', '', regex=True)
     return df_movie
