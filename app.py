@@ -24,12 +24,23 @@ with st.spinner('Chargement de la base de données'):
 url = "https://api.themoviedb.org/3/"
 key = "5b37793600df32594ef72adc9aa2bc75"
 lang = "&language=fr"
-
+headers = {
+    "accept": "application/json",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1YjM3NzkzNjAwZGYzMjU5NGVmNzJhZGM5YWEyYmM3NSIsIm5iZiI6MTczMjE5NzIxNC44MTMsInN1YiI6IjY3M2YzYjVlYWRlOTMxMGYzZmRmYTMxOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.NtriKj7asDAlbg0_at7JcrkW0fwDQnDr99ilDRLrtx4"
+}
 def appel_api(request):
-    response = requests.get(url + request)
+    response = requests.get(url + request,headers=headers)
     result = response.json()
     return result
 
+#fonction qui retourne les deux premier genres du film
+def get_sorted_top_two_genres(genres):
+    genres=genres.replace("]","")
+    genres=genres.replace("[","")
+    genres=genres.replace("'","")
+    # Splitter les genres, les trier, et prendre les deux premiers
+    genres = genres.split(",")
+    return ",".join(genres[:2])
 
 # Construction de la page Streamlit
 st.title("Bienvenue sur les recommandations de votre cinéma")
@@ -54,24 +65,27 @@ if titre_film!="":
 
         #df provisoire pour le knn et suppressiond des nan
         df_knn=df_movie[["originalTitle","id_imdb","id","genre","annee","moyenne","Pays_prod","duree"]]
+        df_knn["genre"] = df_knn["genre"].apply(get_sorted_top_two_genres)
         df_knn=df_knn.dropna()
 
-        #création des dummies et normalisations des données
+        #création des dummies
         df_pays=pd.get_dummies(df_knn["Pays_prod"],prefix="Pays_prod")
-        df_dummy = pd.get_dummies(df_knn["genre"], prefix="genre")
-        df_X=pd.DataFrame(StandardScaler().fit_transform(df_knn[["annee","moyenne","duree"]]))
+        df_genre = pd.get_dummies(df_knn["genre"], prefix="genre")
+        df_X=df_knn[["annee","moyenne","duree"]]
 
-        #concaténations des données normalisée et des dummies afin d'avoir un X_scaled complet et normalisées
-        X_scaled = pd.concat([df_X, df_dummy,df_pays], axis=1)
+        #concaténations des données 
+        X_scaled = pd.concat([df_X,df_genre,df_pays], axis=1)
+        
+        #normalisation et des données afin d'avoir un X_scaled complet et normalisées
+        X_scaled=pd.DataFrame(StandardScaler().fit_transform(X_scaled))
         X_scaled.columns=X_scaled.columns.astype('str')
-
+        
         #création du knn et entrainement du modèle sur notre X_scaled
-        model=NearestNeighbors(n_neighbors=4)
+        model=NearestNeighbors(n_neighbors=4,metric='manhattan')
         model=model.fit(X_scaled)
 
         #on va chercher l'index du film choisi, la target
         film_index = options_dict[titre_film]
-
 
         #on applique le kneighbors sur le film choisi présent dans le X_scaled
         distances, indices=model.kneighbors(X_scaled.iloc[film_index].values.reshape(1, -1))
