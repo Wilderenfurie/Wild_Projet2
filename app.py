@@ -45,8 +45,8 @@ def get_top_2_genres(genres):
 
 def accueil():
     st.write("Bienvenu sur cette application web géniale. elle vous permet de chercher un film que vous aimez ou qui vous intrigue et de recevoir nos recommensations pour des films similiraires")
-    st.subheader("Voici le top 10 des films les plus populaires:")
     st.divider()
+    st.subheader("Voici nos 10 films les plus populaires:")
     df_top10=df_movie.sort_values(["moyenne",'nb_votes'],ascending=False)
     df_top10=df_top10[df_top10['nb_votes'].astype('int')>int(1000000)]
     df_top10=df_top10.head(10)
