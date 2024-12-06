@@ -11,7 +11,7 @@ import urllib.parse
 #chargement de la database imdb et mise en cache pour la performance
 @st.cache_data
 def get_imdb_data():
-    link="https://github.com/Wilderenfurie/Wild_Projet2/blob/6e3e46ee8a87b156ed88f0d9988f1b0b3c910283/df_full.csv?raw=true"
+    link="https://github.com/Wilderenfurie/Wild_Projet2/blob/6976f00a59035d04ced3d71278f8904abb45fcdf/df_full.csv?raw=true"
     df_movie=pd.read_csv(link)
     df_movie=df_movie.astype('str').replace(r'\.0$', '', regex=True)
     df_movie=df_movie.drop_duplicates()
