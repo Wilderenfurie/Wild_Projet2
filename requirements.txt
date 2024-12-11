@@ -2,7 +2,6 @@ streamlit
 streamlit_option_menu
 pandas 
 requests
-time
 sklearn.neighbors
 sklearn.preprocessing
 urllib.parse
