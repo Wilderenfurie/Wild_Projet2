@@ -1,0 +1,10 @@
+streamlit
+option_menu
+pandas 
+requests
+json
+time
+NearestNeighbors
+StandardScaler
+urllib.parse
+Translator
