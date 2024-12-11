@@ -7,7 +7,7 @@ import time
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 import urllib.parse
-from googletrans import Translator
+from translate import Translator
 
 #chargement de la database imdb et mise en cache pour la performance
 @st.cache_data
@@ -44,8 +44,8 @@ def get_top_2_genres(genres):
     genres = genres.split(",")
     return ",".join(genres[:2])
 
-# Google traduction pour les résumés de film
-translator = Translator()
+#traduction pour les résumés de film
+translator = Translator(to_lang="fr")
 
 def accueil():
     st.write("Bienvenu sur cette application web géniale. elle vous permet de chercher un film que vous aimez ou qui vous intrigue et de recevoir nos recommensations pour des films similiraires")
@@ -124,7 +124,7 @@ def recherche_film_par_titre(options_dict,titre_film):
                         if poster_url:
                             st.image(poster_url, width=200)
                     with col_resume:
-                        resume_fr = translator.translate(df_movie["resume"].iloc[index], src='en', dest='fr').text
+                        resume_fr = translator.translate(df_movie["resume"].iloc[index])
                         st.write(resume_fr)
 
                     with col_recommandations1:
