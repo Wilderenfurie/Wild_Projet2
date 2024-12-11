@@ -156,8 +156,6 @@ def recherche_film_par_acteur(acteur,duree,pays,note_deb,note_fin,genre,annee_de
     if result==0:
         st.write("Nous ne connaissons pas cet acteur.")
 
-
-
 def page():
     if selection == "Accueil":
         accueil()
@@ -196,6 +194,13 @@ def page():
         with col_filtre5:
             annee=df_movie["annee"].astype('int').drop_duplicates().sort_values().to_list()
             annee_deb,annee_fin=st.select_slider("Année",annee,value=[min(annee),max(annee)])
+
+        df_movie['primaryName'] = df_movie['primaryName'].apply(lambda x: x.replace('[', '').replace(']', '').replace("'","").replace('"',"").strip().split(','))
+        df_actors = df_movie.explode('primaryName')
+        actors_full=list(df_actors.iloc[:,2].unique())
+        actors_full=actors_full.sort()
+
+        actor = st.multiselect("Quels sont vos acteurs favoris ?", actors_full)
 
         acteur = st.text_input("Recherchez un Acteur / Actrice")
 
