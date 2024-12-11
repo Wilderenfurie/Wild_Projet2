@@ -1,10 +1,10 @@
 streamlit
-option_menu
+streamlit_option_menu
 pandas 
 requests
 json
 time
-NearestNeighbors
-StandardScaler
+sklearn.neighbors
+sklearn.preprocessing
 urllib.parse
-Translator
+googletrans
