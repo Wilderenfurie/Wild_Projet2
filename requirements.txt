@@ -2,7 +2,5 @@ streamlit
 streamlit_option_menu
 pandas 
 requests
-sklearn.neighbors
-sklearn.preprocessing
-urllib.parse
+scikit-learn
 googletrans
