@@ -48,7 +48,7 @@ def get_top_2_genres(genres):
 translator = Translator(to_lang="fr")
 
 def accueil():
-    st.write("Bienvenu sur cette application web géniale. elle vous permet de chercher un film que vous aimez ou qui vous intrigue et de recevoir nos recommensations pour des films similiraires")
+    st.write("Bienvenue sur cette application web géniale. elle vous permet de chercher un film que vous aimez ou qui vous intrigue et de recevoir nos recommensations pour des films similiraires")
     st.divider()
     st.subheader("Voici nos 10 films les plus populaires:")
     df_top10=df_movie.sort_values(["moyenne",'nb_votes'],ascending=False)
