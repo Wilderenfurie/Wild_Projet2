@@ -8,6 +8,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 import urllib.parse
 
+
 #chargement de la database imdb et mise en cache pour la performance
 @st.cache_data
 def get_imdb_data():
@@ -141,10 +142,23 @@ def recherche_film_par_titre(options_dict,titre_film):
                 cpt+=1
 
 
+def recherche_film_par_acteur(acteur,duree,pays,note_deb,note_fin,genre,annee_deb,annee_fin):
+    result=0
+    for name,job in zip(df_movie['primaryName'],df_movie['primaryProfession']):
+        if  acteur in name and ('actor' in job or 'actress' in job):
+            st.write(df_movie[df_movie['primaryName']==name])
+            result+=1
+
+    if result==0:
+        st.write("Nous ne connaissons pas cet acteur.")
+
+
+
 def page():
     if selection == "Accueil":
         accueil()
-    elif selection == "Rechercher un film":
+
+    elif selection == "Rechercher par titre":
         # Champs de recherche utilisateur
         options_dict = {f"{row['originalTitle']}  [{row['annee']}]": idx for idx, row in df_movie.iterrows()}
         options = [""] + list(options_dict.keys())
@@ -157,11 +171,39 @@ def page():
         if titre_film!="":
             recherche_film_par_titre(options_dict,titre_film)
 
+    elif selection =="Rechercher par acteur":
+        col_filtre1,col_filtre2,col_filtre3=st.columns(3,vertical_alignment="center")
+        col_filtre4,col_filtre5=st.columns(2,vertical_alignment="center")
+        with col_filtre1:
+            runtime=df_movie["duree"].astype('int').drop_duplicates().sort_values().to_list()
+            duree=st.select_slider("Durée",runtime,[min(runtime),max(runtime)])
+        with col_filtre2:
+            pays_prod=df_movie["Pays_prod"].apply(get_top_2_genres).drop_duplicates().sort_values().to_list()
+            pays=st.selectbox("Pays",pays_prod)
+        with col_filtre3:
+            score=df_movie["moyenne"].astype('float').drop_duplicates().sort_values().to_list()
+            note_deb,note_fin=st.select_slider("Note",score,[min(score),max(score)])
+
+        with col_filtre4:
+            genra=df_movie["genre"].apply(get_top_2_genres).drop_duplicates().sort_values().to_list()
+            genra.insert(0,"")
+            genre=st.selectbox("Genre",genra)
+            
+        with col_filtre5:
+            annee=df_movie["annee"].astype('int').drop_duplicates().sort_values().to_list()
+            annee_deb,annee_fin=st.select_slider("Année",annee,value=[min(annee),max(annee)])
+
+        acteur = st.text_input("Recherchez un Acteur / Actrice")
+
+        if acteur!="":
+            recherche_film_par_acteur(acteur,duree,pays,note_deb,note_fin,genre,annee_deb,annee_fin)
+
+
 
 with st.sidebar:
         selection = option_menu(
                     menu_title=None,
-                    options = ["Accueil", "Rechercher un film"]
+                    options = ["Accueil","Rechercher par titre","Rechercher par acteur"]
         )
 
 
