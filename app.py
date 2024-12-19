@@ -188,12 +188,17 @@ def detail(detail_titre,detail_resume,detail_genre,detail_poster,detail_duree,de
  
     
 
-def recherche_film_par_acteur(acteur,duree,pays,note_deb,note_fin,genre,annee_deb,annee_fin):
+def recherche_film_par_acteur(acteur,duree_deb,duree_fin,pays,note_deb,note_fin,genre,annee_deb,annee_fin):
     result=0
     for name,job in zip(df_movie['primaryName'],df_movie['primaryProfession']):
         if  acteur in name and ('actor' in job or 'actress' in job):
-            st.write(df_movie[df_movie['primaryName']==name])
-            result+=1
+            index=df_movie[df_movie['primaryName']==name].index
+            if (duree_deb<=int(df_movie["duree"].iloc[index]))  &  (int(df_movie["duree"].iloc[index])<=duree_fin):
+                if (note_deb<=float(df_movie["moyenne"].iloc[index]))  &  (float(df_movie["moyenne"].iloc[index])<=note_fin):
+                    st.subheader(df_movie["originalTitle"].iloc[index])
+                    
+                    result+=1
+        
 
     if result==0:
         st.write("Nous ne connaissons pas cet acteur.")
@@ -222,10 +227,10 @@ def page():
         col_filtre4,col_filtre5=st.columns(2,vertical_alignment="center")
         with col_filtre1:
             runtime=df_movie["duree"].astype('int').drop_duplicates().sort_values().to_list()
-            duree=st.select_slider("Durée",runtime,[min(runtime),max(runtime)])
+            duree_deb,duree_fin=st.select_slider("Durée",runtime,[min(runtime),max(runtime)])
         with col_filtre2:
             pays_prod=df_movie["Pays_prod"].apply(get_top_2_genres).drop_duplicates().sort_values().to_list()
-            pays=st.selectbox("Pays",pays_prod)
+            pays=st.multiselect("Pays",pays_prod)
         with col_filtre3:
             score=df_movie["moyenne"].astype('float').drop_duplicates().sort_values().to_list()
             note_deb,note_fin=st.select_slider("Note",score,[min(score),max(score)])
@@ -242,7 +247,7 @@ def page():
         acteur = st.text_input("Recherchez un Acteur / Actrice")
 
         if acteur!="":
-            recherche_film_par_acteur(acteur,duree,pays,note_deb,note_fin,genre,annee_deb,annee_fin)
+            recherche_film_par_acteur(acteur,duree_deb,duree_fin,pays,note_deb,note_fin,genre,annee_deb,annee_fin)
 
 
 
