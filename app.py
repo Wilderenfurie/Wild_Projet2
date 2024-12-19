@@ -7,7 +7,7 @@ import time
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 import urllib.parse
-from translate import Translator
+from deep_translator import GoogleTranslator
 
 #chargement de la database imdb et mise en cache pour la performance
 @st.cache_data
@@ -45,10 +45,10 @@ def get_top_2_genres(genres):
     return ",".join(genres[:2])
 
 #traduction pour les résumés de film
-translator = Translator(to_lang="fr")
+translator = GoogleTranslator(source='en', target='fr')
 
 def accueil():
-    st.write("Bienvenue sur cette application web géniale. elle vous permet de chercher un film que vous aimez ou qui vous intrigue et de recevoir nos recommensations pour des films similiraires")
+    st.write("Bienvenue sur cette application web géniale. elle vous permet de chercher un film que vous aimez ou qui vous intrigue et de recevoir nos recommendations pour des films similiraires")
     st.divider()
     st.subheader("Voici nos 10 films les plus populaires:")
     df_top10=df_movie.sort_values(["moyenne",'nb_votes'],ascending=False)
@@ -73,6 +73,13 @@ def accueil():
             poster_url = f"https://image.tmdb.org/t/p/w500{row['poster']}"
             if poster_url:
                 st.image(poster_url, width=200)
+            detail_titre=df_movie["originalTitle"].iloc[index]
+            detail_resume=df_movie["resume"].iloc[index]
+            detail_genre=df_movie["genre"].iloc[index]
+            detail_poster=poster_url
+            detail_duree=df_movie["duree"].iloc[index]
+            detail_acteurs=df_movie['primaryName'].iloc[index]
+            st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_poster,detail_duree,detail_acteurs))
         cpt+=1
 
 
@@ -124,9 +131,21 @@ def recherche_film_par_titre(options_dict,titre_film):
                         if poster_url:
                             st.image(poster_url, width=200)
                     with col_resume:
-                        resume_fr = translator.translate(df_movie["resume"].iloc[index])
+                        resume=df_movie["resume"].iloc[index]
+                        if len(resume)<=500:
+                            resume_fr = translator.translate(resume)
+                        elif len(resume)<=1000:
+                            resume1=resume[:500]
+                            resume2=resume[500:]
+                            resume_fr = translator.translate(resume1) + translator.translate(resume2)
                         st.write(resume_fr)
-
+                        detail_titre=df_movie["originalTitle"].iloc[index]
+                        detail_resume=df_movie["resume"].iloc[index]
+                        detail_genre=df_movie["genre"].iloc[index]
+                        detail_poster=poster_url
+                        detail_duree=df_movie["duree"].iloc[index]
+                        detail_acteurs=df_movie['primaryName'].iloc[index]
+                        st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_poster,detail_duree,detail_acteurs))
                     with col_recommandations1:
                         st.divider()
                         st.subheader("On vous recommande aussi :")
@@ -143,8 +162,31 @@ def recherche_film_par_titre(options_dict,titre_film):
                         poster_url = f"https://image.tmdb.org/t/p/w500{df_movie['poster'].iloc[index]}"
                         if poster_url:
                             st.image(poster_url, width=200)
+                        detail_titre=df_movie["originalTitle"].iloc[index]
+                        detail_resume=df_movie["resume"].iloc[index]
+                        detail_genre=df_movie["genre"].iloc[index]
+                        detail_poster=poster_url
+                        detail_duree=df_movie["duree"].iloc[index]
+                        detail_acteurs=df_movie['primaryName'].iloc[index]
+                        st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_poster,detail_duree,detail_acteurs))
                 cpt+=1
 
+@st.dialog("Détails")
+def detail(detail_titre,detail_resume,detail_genre,detail_poster,detail_duree,detail_acteurs):
+    st.subheader(detail_titre)
+    st.write("Genre : "+translator.translate(detail_genre))
+    st.write("Durée : "+detail_duree + " min")
+    st.write("Casting : "+detail_acteurs)
+    st.image(detail_poster, width=200)
+    if len(detail_resume)<=500:
+        detail_resume = translator.translate(detail_resume)
+    elif len(detail_resume)<=1000:
+        resume1=detail_resume[:500]
+        resume2=detail_resume[500:]
+        detail_resume = translator.translate(resume1) + translator.translate(resume2)
+    st.write(detail_resume)
+ 
+    
 
 def recherche_film_par_acteur(acteur,duree,pays,note_deb,note_fin,genre,annee_deb,annee_fin):
     result=0
@@ -222,5 +264,18 @@ st.text("")
 page()
 
                 
-                   
+st.markdown(
+    """
+    <style>
+    button {
+        cursor: pointer;
+        transition: all .2s ease-in-out;
+    }
+    button:hover {
+        transform: scale(1.2);
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)          
                    

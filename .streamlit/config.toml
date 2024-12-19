@@ -1,2 +1,3 @@
 [theme]
-backgroundColor="#DCDCDC"
+base="dark"
+primaryColor="darkred"
