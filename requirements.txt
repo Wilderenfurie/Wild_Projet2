@@ -3,4 +3,4 @@ streamlit_option_menu
 pandas 
 requests
 scikit-learn
-translate
+deep_translator
