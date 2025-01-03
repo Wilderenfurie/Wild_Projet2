@@ -16,6 +16,7 @@ def get_imdb_data():
     df_movie=pd.read_csv(link)
     df_movie=df_movie.astype('str').replace(r'\.0$', '', regex=True)
     df_movie=df_movie.drop_duplicates()
+    df_movie=df_movie.dropna()
     return df_movie
 
 with st.spinner('Chargement de la base de données'):
@@ -43,6 +44,18 @@ def get_top_2_genres(genres):
     # Splitter les genres, les trier, et prendre les deux premiers
     genres = genres.split(",")
     return ",".join(genres[:2])
+
+#fonction qui retourne le premier genre du film
+def get_top_1_genres(genres):
+    genres=genres.replace("]","")
+    genres=genres.replace("[","")
+    genres=genres.replace("'","")
+    # Splitter les genres, les trier, et prendre les deux premiers
+    genres = genres.split(",")
+    return ",".join(genres[:1])
+
+
+
 
 #traduction pour les résumés de film
 translator = GoogleTranslator(source='en', target='fr')
@@ -73,13 +86,16 @@ def accueil():
             poster_url = f"https://image.tmdb.org/t/p/w500{row['poster']}"
             if poster_url:
                 st.image(poster_url, width=200)
+            
+            # Creation du detail et appel de la fonction
             detail_titre=df_movie["originalTitle"].iloc[index]
             detail_resume=df_movie["resume"].iloc[index]
             detail_genre=df_movie["genre"].iloc[index]
+            detail_pays=df_movie['Pays_prod'].iloc[index]
             detail_poster=poster_url
             detail_duree=df_movie["duree"].iloc[index]
             detail_acteurs=df_movie['primaryName'].iloc[index]
-            st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_poster,detail_duree,detail_acteurs))
+            st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_acteurs))
         cpt+=1
 
 
@@ -132,20 +148,18 @@ def recherche_film_par_titre(options_dict,titre_film):
                             st.image(poster_url, width=200)
                     with col_resume:
                         resume=df_movie["resume"].iloc[index]
-                        if len(resume)<=500:
-                            resume_fr = translator.translate(resume)
-                        elif len(resume)<=1000:
-                            resume1=resume[:500]
-                            resume2=resume[500:]
-                            resume_fr = translator.translate(resume1) + translator.translate(resume2)
+                        resume_fr = translator.translate(resume)
                         st.write(resume_fr)
+                        
+                        # Creation du detail et appel de la fonction
                         detail_titre=df_movie["originalTitle"].iloc[index]
                         detail_resume=df_movie["resume"].iloc[index]
                         detail_genre=df_movie["genre"].iloc[index]
+                        detail_pays=df_movie['Pays_prod'].iloc[index]
                         detail_poster=poster_url
                         detail_duree=df_movie["duree"].iloc[index]
                         detail_acteurs=df_movie['primaryName'].iloc[index]
-                        st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_poster,detail_duree,detail_acteurs))
+                        st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_acteurs))
                     with col_recommandations1:
                         st.divider()
                         st.subheader("On vous recommande aussi :")
@@ -162,46 +176,81 @@ def recherche_film_par_titre(options_dict,titre_film):
                         poster_url = f"https://image.tmdb.org/t/p/w500{df_movie['poster'].iloc[index]}"
                         if poster_url:
                             st.image(poster_url, width=200)
+                    
+                        # Creation du detail et appel de la fonction
                         detail_titre=df_movie["originalTitle"].iloc[index]
                         detail_resume=df_movie["resume"].iloc[index]
                         detail_genre=df_movie["genre"].iloc[index]
+                        detail_pays=df_movie['Pays_prod'].iloc[index]
                         detail_poster=poster_url
                         detail_duree=df_movie["duree"].iloc[index]
                         detail_acteurs=df_movie['primaryName'].iloc[index]
-                        st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_poster,detail_duree,detail_acteurs))
+                        st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_acteurs))
                 cpt+=1
 
+# Fonction details qui affiche un maximum d'info a l'utilisateur 
 @st.dialog("Détails")
-def detail(detail_titre,detail_resume,detail_genre,detail_poster,detail_duree,detail_acteurs):
+def detail(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_acteurs):
     st.subheader(detail_titre)
     st.write("Genre : "+translator.translate(detail_genre))
+    st.write(detail_pays)
     st.write("Durée : "+detail_duree + " min")
     st.write("Casting : "+detail_acteurs)
     st.image(detail_poster, width=200)
-    if len(detail_resume)<=500:
-        detail_resume = translator.translate(detail_resume)
-    elif len(detail_resume)<=1000:
-        resume1=detail_resume[:500]
-        resume2=detail_resume[500:]
-        detail_resume = translator.translate(resume1) + translator.translate(resume2)
+    detail_resume = translator.translate(detail_resume)
     st.write(detail_resume)
  
     
 
 def recherche_film_par_acteur(acteur,duree_deb,duree_fin,pays,note_deb,note_fin,genre,annee_deb,annee_fin):
+    # Boucle sur l'acteur et mise en place des filtres et de la mise en page si acteur trouvé
     result=0
     for name,job in zip(df_movie['primaryName'],df_movie['primaryProfession']):
         if  acteur in name and ('actor' in job or 'actress' in job):
             index=df_movie[df_movie['primaryName']==name].index
-            if (duree_deb<=int(df_movie["duree"].iloc[index]))  &  (int(df_movie["duree"].iloc[index])<=duree_fin):
-                if (note_deb<=float(df_movie["moyenne"].iloc[index]))  &  (float(df_movie["moyenne"].iloc[index])<=note_fin):
-                    st.subheader(df_movie["originalTitle"].iloc[index])
-                    
-                    result+=1
-        
+            if ((duree_deb<=int(df_movie["duree"].iloc[index[0]]))  &  (int(df_movie["duree"].iloc[index[0]])<=duree_fin)):
+                if ((note_deb<=float(df_movie["moyenne"].iloc[index[0]]))  &  (float(df_movie["moyenne"].iloc[index[0]])<=note_fin)):
+                    if ((annee_deb<=int(df_movie["annee"].iloc[index[0]])) & (int(df_movie["annee"].iloc[index[0]]) <=annee_fin)):
+                        if any(p in df_movie['Pays_prod'].iloc[index[0]] for p in pays) or not pays:
+                            if any(g in df_movie['genre'].iloc[index[0]] for g in genre) or not genre:
 
+                                col1,col4=st.columns(2,vertical_alignment="center")
+                                col2,col3 = st.columns(2,vertical_alignment="center")
+                            
+                                with col1:
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.write(" ")
+                                    st.subheader(df_movie["originalTitle"].iloc[index[0]])
+                                with col2:
+                                    poster_url = f"https://image.tmdb.org/t/p/w500{df_movie['poster'].iloc[index[0]]}"
+                                    if poster_url:
+                                        st.image(poster_url, width=200)
+                                with col3:
+                                    resume=df_movie["resume"].iloc[index[0]]
+
+                                    resume = translator.translate(resume)
+                                    st.write(resume)
+
+                                # Creation du detail et appel de la fonction
+                                detail_titre=df_movie["originalTitle"].iloc[index[0]]
+                                detail_resume=df_movie["resume"].iloc[index[0]]
+                                detail_genre=df_movie["genre"].iloc[index[0]]
+                                detail_pays=df_movie['Pays_prod'].iloc[index[0]]
+                                detail_poster=poster_url
+                                detail_duree=df_movie["duree"].iloc[index[0]]
+                                detail_acteurs=df_movie['primaryName'].iloc[index[0]]
+                                st.button("Détails",type="secondary",key=result,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_acteurs))
+                                
+                                st.write(" ")
+                                st.write(" ")
+                                st.write(" ")
+                                # on indique que l'on a un resultat
+                                result+=1
+
+    # Si aucun acteur trouvé on affiche un message d'erreur
     if result==0:
-        st.write("Nous ne connaissons pas cet acteur.")
+        st.write("Nous ne connaissons pas cet acteur ou filtres incorrect")
 
 
 
@@ -210,7 +259,7 @@ def page():
         accueil()
 
     elif selection == "Rechercher par titre":
-        # Champs de recherche utilisateur
+        # Champs de recherche du titre
         options_dict = {f"{row['originalTitle']}  [{row['annee']}]": idx for idx, row in df_movie.iterrows()}
         options = [""] + list(options_dict.keys())
         titre_film = st.selectbox("Recherchez un film par titre :", options)
@@ -223,22 +272,24 @@ def page():
             recherche_film_par_titre(options_dict,titre_film)
 
     elif selection =="Rechercher par acteur":
+        # Champs de recherche de l'acteur et création des filtres
         col_filtre1,col_filtre2,col_filtre3=st.columns(3,vertical_alignment="center")
         col_filtre4,col_filtre5=st.columns(2,vertical_alignment="center")
         with col_filtre1:
             runtime=df_movie["duree"].astype('int').drop_duplicates().sort_values().to_list()
             duree_deb,duree_fin=st.select_slider("Durée",runtime,[min(runtime),max(runtime)])
         with col_filtre2:
-            pays_prod=df_movie["Pays_prod"].apply(get_top_2_genres).drop_duplicates().sort_values().to_list()
+            pays_prod=df_movie["Pays_prod"].apply(get_top_1_genres).drop_duplicates().sort_values().to_list()
             pays=st.multiselect("Pays",pays_prod)
         with col_filtre3:
             score=df_movie["moyenne"].astype('float').drop_duplicates().sort_values().to_list()
             note_deb,note_fin=st.select_slider("Note",score,[min(score),max(score)])
 
         with col_filtre4:
-            genra=df_movie["genre"].apply(get_top_2_genres).drop_duplicates().sort_values().to_list()
+            genra=df_movie["genre"].apply(get_top_1_genres).drop_duplicates().sort_values().to_list()
             genra.insert(0,"")
-            genre=st.selectbox("Genre",genra)
+            genra.pop()
+            genre=st.multiselect("Genre",genra)
             
         with col_filtre5:
             annee=df_movie["annee"].astype('int').drop_duplicates().sort_values().to_list()
@@ -246,11 +297,12 @@ def page():
 
         acteur = st.text_input("Recherchez un Acteur / Actrice")
 
+        # Resultat de la recherche
         if acteur!="":
             recherche_film_par_acteur(acteur,duree_deb,duree_fin,pays,note_deb,note_fin,genre,annee_deb,annee_fin)
 
 
-
+# On ajoute la sidebar et on lui affecte nos pages
 with st.sidebar:
         selection = option_menu(
                     menu_title=None,
@@ -266,9 +318,10 @@ st.text("")
 st.text("")
 st.text("")
 
+# On appelle la fonction page qui contient les autres fonctions 
 page()
 
-                
+# Ajout d'elements de styles               
 st.markdown(
     """
     <style>
