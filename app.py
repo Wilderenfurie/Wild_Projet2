@@ -43,7 +43,7 @@ def get_top_2_genres(genres):
     genres=genres.replace("'","")
     # Splitter les genres, les trier, et prendre les deux premiers
     genres = genres.split(",")
-    return ",".join(genres[:2])
+    return ",".join(genres[:3])
 
 #fonction qui retourne le premier genre du film
 def get_top_1_genres(genres):
