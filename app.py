@@ -36,14 +36,14 @@ def appel_api(request):
     result = response.json()
     return result
 
-#fonction qui retourne les trois premier genres du film
-def get_top_3_genres(genres):
+#fonction qui retourne les deux premier genres du film
+def get_top_2_genres(genres):
     genres=genres.replace("]","")
     genres=genres.replace("[","")
     genres=genres.replace("'","")
-    # Splitter les genres, les trier, et prendre les trois premiers
+    # Splitter les genres, les trier, et prendre les deux premiers
     genres = genres.split(",")
-    return ",".join(genres[:3])
+    return ",".join(genres[:2])
 
 #fonction qui retourne le premier genre du film
 def get_top_1_genres(genres):
@@ -104,7 +104,7 @@ def recherche_film_par_titre(options_dict,titre_film):
 
             #df provisoire pour le knn et suppressiond des nan
             df_knn=df_movie[["originalTitle","id_imdb","id","genre","annee","moyenne","Pays_prod","duree"]]
-            df_knn["genre"] = df_knn["genre"].apply(get_top_3_genres)
+            df_knn["genre"] = df_knn["genre"].apply(get_top_2_genres)
             df_knn=df_knn.dropna()
 
             #création des dummies
