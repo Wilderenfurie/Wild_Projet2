@@ -94,8 +94,9 @@ def accueil():
             detail_pays=df_movie['Pays_prod'].iloc[index]
             detail_poster=poster_url
             detail_duree=df_movie["duree"].iloc[index]
+            detail_note=df_movie["moyenne"].iloc[index]
             detail_acteurs=df_movie['primaryName'].iloc[index]
-            st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_acteurs))
+            st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_note,detail_acteurs))
         cpt+=1
 
 
@@ -158,8 +159,9 @@ def recherche_film_par_titre(options_dict,titre_film):
                         detail_pays=df_movie['Pays_prod'].iloc[index]
                         detail_poster=poster_url
                         detail_duree=df_movie["duree"].iloc[index]
+                        detail_note=df_movie["moyenne"].iloc[index]
                         detail_acteurs=df_movie['primaryName'].iloc[index]
-                        st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_acteurs))
+                        st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_note,detail_acteurs))
                     with col_recommandations1:
                         st.divider()
                         st.subheader("On vous recommande aussi :")
@@ -184,17 +186,19 @@ def recherche_film_par_titre(options_dict,titre_film):
                         detail_pays=df_movie['Pays_prod'].iloc[index]
                         detail_poster=poster_url
                         detail_duree=df_movie["duree"].iloc[index]
+                        detail_note=df_movie["moyenne"].iloc[index]
                         detail_acteurs=df_movie['primaryName'].iloc[index]
-                        st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_acteurs))
+                        st.button("Détails",type="secondary",key=cpt,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_note,detail_acteurs))
                 cpt+=1
 
 # Fonction details qui affiche un maximum d'info a l'utilisateur 
 @st.dialog("Détails")
-def detail(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_acteurs):
+def detail(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_note,detail_acteurs):
     st.subheader(detail_titre)
     st.write("Genre : "+translator.translate(detail_genre))
     st.write(detail_pays)
     st.write("Durée : "+detail_duree + " min")
+    st.write("Note : "+detail_note)
     st.write("Casting : "+detail_acteurs)
     st.image(detail_poster, width=200)
     detail_resume = translator.translate(detail_resume)
@@ -239,8 +243,9 @@ def recherche_film_par_acteur(acteur,duree_deb,duree_fin,pays,note_deb,note_fin,
                                 detail_pays=df_movie['Pays_prod'].iloc[index[0]]
                                 detail_poster=poster_url
                                 detail_duree=df_movie["duree"].iloc[index[0]]
+                                detail_note=df_movie["moyenne"].iloc[index[0]]
                                 detail_acteurs=df_movie['primaryName'].iloc[index[0]]
-                                st.button("Détails",type="secondary",key=result,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_acteurs))
+                                st.button("Détails",type="secondary",key=result,on_click=detail,args=(detail_titre,detail_resume,detail_genre,detail_pays,detail_poster,detail_duree,detail_note,detail_acteurs))
                                 
                                 st.write(" ")
                                 st.write(" ")
